@@ -37,12 +37,12 @@ class _MyAppState extends State<MyApp> {
 
 
       if (status) {
-        final authStatus = await _appleHealthClinicalRecordsPlugin.requestAuthorization() ?? false;
+        final authStatus = await _appleHealthClinicalRecordsPlugin.requestAuthorization(ClinicalType.allergy) ?? false;
 
         debugPrint(authStatus.toString());
 
         if (authStatus) {
-          final data = await _appleHealthClinicalRecordsPlugin.getData('allergy');
+          final data = await _appleHealthClinicalRecordsPlugin.getData(ClinicalType.allergy);
 
           debugPrint(data.toString());
         }

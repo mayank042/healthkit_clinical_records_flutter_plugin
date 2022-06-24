@@ -43,6 +43,8 @@ public class SwiftAppleHealthClinicalRecordsPlugin: NSObject, FlutterPlugin {
         return Set(Section.healthRecords.types)
     }
     
+    var sampleTypesDict: [String: HKSampleType] = [:]
+    
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "apple_health_clinical_records", binaryMessenger: registrar.messenger())
         let instance = SwiftAppleHealthClinicalRecordsPlugin()
@@ -51,18 +53,20 @@ public class SwiftAppleHealthClinicalRecordsPlugin: NSObject, FlutterPlugin {
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         
+        initializeTypes()
+        
         /// Handle checkIfHealthDataAvailable
         if (call.method.elementsEqual("checkIfHealthDataAvailable")){
             checkIfHealthDataAvailable(call: call, result: result)
         }
         /// Handle requestAuthorization
         else if (call.method.elementsEqual("requestAuthorization")){
-            requestAuthorization(call: call, result: result)
+            try! requestAuthorization(call: call, result: result)
         }
         
         /// Handle getData
         else if (call.method.elementsEqual("getData")){
-            getData(call: call, result: result)
+           try! getData(call: call, result: result)
         }
         
     }
@@ -72,55 +76,46 @@ public class SwiftAppleHealthClinicalRecordsPlugin: NSObject, FlutterPlugin {
     }
     
     
-    func requestAuthorization(call: FlutterMethodCall, result: @escaping FlutterResult) {
+    func requestAuthorization(call: FlutterMethodCall, result: @escaping FlutterResult) throws {
         
-        if #available(iOS 13.0, *) {
-            healthStore.requestAuthorization(toShare: Set(), read: sampleTypes) { (success, error) in
-                DispatchQueue.main.async {
-                    result(success)
-                }
+        let arguments = call.arguments as? NSDictionary
+        
+        
+        guard let sampleTypeKey = arguments?["sampleType"] as? String
+                
+        else {
+            throw PluginError(message: "Invalid Arguments!")
+        }
+        
+        
+        let status = healthStore.authorizationStatus(for: sampleTypesDict[sampleTypeKey]!)
+        
+        if status == HKAuthorizationStatus.sharingAuthorized {
+            result(true)
+        }
+        
+        healthStore.requestAuthorization(toShare: Set(), read: [sampleTypesDict[sampleTypeKey]!]) { (success, error) in
+            DispatchQueue.main.async {
+                result(success)
             }
         }
-        else {
-            result(false)// Handle the error here.
-        }
+        
+        
     }
     
     
-    func getData(call: FlutterMethodCall, result: @escaping FlutterResult) {
+    func getData(call: FlutterMethodCall, result: @escaping FlutterResult) throws {
         let arguments = call.arguments as? NSDictionary
-        let sampleTypeKey = (arguments?["sampleType"] as? String)!
-        
-        switch sampleTypeKey {
-        case "allergy":
-            queryForSamples(sampleType: HKObjectType.clinicalType(forIdentifier: .allergyRecord)!, result: result)
-        case "condition":
-            queryForSamples(sampleType: HKObjectType.clinicalType(forIdentifier: .conditionRecord)!, result: result)
-        case "coverage":
-            if #available(iOS 14.0, *) {
-                queryForSamples(sampleType: HKObjectType.clinicalType(forIdentifier: .coverageRecord)!, result: result)
-            } else {
-                // Fallback on earlier versions
-                result(nil)
-            }
-        case "immunization":
-            queryForSamples(sampleType: HKObjectType.clinicalType(forIdentifier: .immunizationRecord)!, result: result)
-            
-        case "labResult":
-            queryForSamples(sampleType: HKObjectType.clinicalType(forIdentifier: .labResultRecord)!, result: result)
-            
-        case "medication":
-            queryForSamples(sampleType: HKObjectType.clinicalType(forIdentifier: .medicationRecord)!, result: result)
-            
-        case "procedure":
-            queryForSamples(sampleType: HKObjectType.clinicalType(forIdentifier: .procedureRecord)!, result: result)
-            
-        case "vitalSign":
-            queryForSamples(sampleType: HKObjectType.clinicalType(forIdentifier: .vitalSignRecord)!, result: result)
-            
-        default:
-            result(nil)
+         
+        guard let sampleTypeKey = arguments?["sampleType"] as? String
+                
+        else {
+            throw PluginError(message: "Invalid Arguments!")
         }
+        
+        
+        queryForSamples(sampleType: sampleTypesDict[sampleTypeKey]!, result: result)
+        
     }
     
     
@@ -130,7 +125,6 @@ public class SwiftAppleHealthClinicalRecordsPlugin: NSObject, FlutterPlugin {
         let query = HKSampleQuery(sampleType: sampleType, predicate: nil, limit: 100, sortDescriptors: sortDescriptors) {(_, samplesOrNil, error) in
             DispatchQueue.main.async {
                 guard let samples = samplesOrNil else {
-                    print("error in querying records")
                     return
                 }
                 
@@ -160,6 +154,31 @@ public class SwiftAppleHealthClinicalRecordsPlugin: NSObject, FlutterPlugin {
         }
         
         healthStore.execute(query)
+    }
+    
+    func initializeTypes() {
+    
+        
+        sampleTypesDict["allergy"] = HKObjectType.clinicalType(forIdentifier: .allergyRecord)!
+        
+        sampleTypesDict["condition"] = HKObjectType.clinicalType(forIdentifier: .conditionRecord)!
+        
+        if #available(iOS 14.0, *) {
+            sampleTypesDict["coverage"] = HKObjectType.clinicalType(forIdentifier: .coverageRecord)!
+        } else {
+            // Fallback on earlier versions
+        }
+        
+        sampleTypesDict["immunization"] = HKObjectType.clinicalType(forIdentifier: .immunizationRecord)!
+        
+        sampleTypesDict["labResult"] = HKObjectType.clinicalType(forIdentifier: .labResultRecord)!
+        
+        sampleTypesDict["medication"] = HKObjectType.clinicalType(forIdentifier: .medicationRecord)!
+        
+        sampleTypesDict["procedure"] = HKObjectType.clinicalType(forIdentifier: .procedureRecord)!
+        
+        sampleTypesDict["vitalSign"] = HKObjectType.clinicalType(forIdentifier: .vitalSignRecord)!
+    
     }
     
     
