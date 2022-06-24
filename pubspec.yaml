@@ -1,6 +1,6 @@
 name: apple_health_clinical_records
 description: Fetch clinical records from apple health in form of FHIR json.
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/mayank042/healthkit_clinical_records_flutter_plugin
 repository: https://github.com/mayank042/healthkit_clinical_records_flutter_plugin
 
@@ -9,6 +9,7 @@ environment:
   flutter: ">=2.5.0"
 
 dependencies:
+  device_info_plus: ^4.0.0
   flutter:
     sdk: flutter
   plugin_platform_interface: ^2.0.2

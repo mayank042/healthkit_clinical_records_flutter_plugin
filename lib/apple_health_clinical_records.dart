@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'apple_health_clinical_records_platform_interface.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 enum ClinicalType {
   allergy,
@@ -36,7 +39,13 @@ extension ClinicalTypeX on ClinicalType {
 }
 
 class AppleHealthClinicalRecords {
+
   Future<bool?> checkIfHealthDataAvailable() {
+
+    if (Platform.isAndroid) {
+      return Future.value(false);
+    }
+
     return AppleHealthClinicalRecordsPlatform.instance
         .checkIfHealthDataAvailable();
   }
