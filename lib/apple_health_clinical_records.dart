@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'apple_health_clinical_records_platform_interface.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 
 enum ClinicalType {
   allergy,
