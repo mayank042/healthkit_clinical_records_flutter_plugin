@@ -9,24 +9,28 @@ class MethodChannelAppleHealthClinicalRecords extends AppleHealthClinicalRecords
   @visibleForTesting
   final methodChannel = const MethodChannel('apple_health_clinical_records');
 
+  /// implementation of [checkIfHealthDataAvailable]
   @override
   Future<bool?> checkIfHealthDataAvailable() async {
     final status = await methodChannel.invokeMethod<dynamic>('checkIfHealthDataAvailable');
     return status;
   }
 
+  /// implementation of [hasAuthorization]
   @override
   Future<bool?> hasAuthorization(String type) async {
     final status = await methodChannel.invokeMethod<dynamic>('hasAuthorization', { 'type': type });
     return status;
   }
 
+  /// implementation of [requestAuthorization]
   @override
   Future<bool?> requestAuthorization(List<String> types) async {
     final status = await methodChannel.invokeMethod<dynamic>('requestAuthorization', { 'types': types });
     return status;
   }
 
+  /// implementation of [getData]
   @override
   Future<dynamic> getData(String sampleType) async {
     final data = await methodChannel.invokeMethod<dynamic>('getData', { 'sampleType': sampleType });

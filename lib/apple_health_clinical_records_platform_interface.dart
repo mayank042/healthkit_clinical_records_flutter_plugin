@@ -2,6 +2,7 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'apple_health_clinical_records_method_channel.dart';
 
+/// A representation of plugin methods.
 abstract class AppleHealthClinicalRecordsPlatform extends PlatformInterface {
   /// Constructs a AppleHealthClinicalRecordsPlatform.
   AppleHealthClinicalRecordsPlatform() : super(token: _token);
@@ -23,18 +24,22 @@ abstract class AppleHealthClinicalRecordsPlatform extends PlatformInterface {
     _instance = instance;
   }
 
+  /// Performs the check if apple health is available on device
   Future<bool?> checkIfHealthDataAvailable() {
     throw UnimplementedError('checkIfHealthDataAvailable() has not been implemented.');
   }
 
+  /// Request read only permission to [types]
   Future<bool?> requestAuthorization(List<String> types) {
     throw UnimplementedError('requestAuthorization() has not been implemented.');
   }
 
+  /// Check if [type] already has read permission
   Future<bool?> hasAuthorization(String type) {
     throw UnimplementedError('hasAuthorization() has not been implemented.');
   }
 
+  /// Get clinical records of [sampleType]
   Future<dynamic> getData(String sampleType) {
     throw UnimplementedError('getData() has not been implemented.');
   }
