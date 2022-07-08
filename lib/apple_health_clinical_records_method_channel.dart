@@ -16,8 +16,14 @@ class MethodChannelAppleHealthClinicalRecords extends AppleHealthClinicalRecords
   }
 
   @override
-  Future<bool?> requestAuthorization(String sampleType) async {
-    final status = await methodChannel.invokeMethod<dynamic>('requestAuthorization', { 'sampleType': sampleType });
+  Future<bool?> hasAuthorization(String type) async {
+    final status = await methodChannel.invokeMethod<dynamic>('hasAuthorization', { 'type': type });
+    return status;
+  }
+
+  @override
+  Future<bool?> requestAuthorization(List<String> types) async {
+    final status = await methodChannel.invokeMethod<dynamic>('requestAuthorization', { 'types': types });
     return status;
   }
 

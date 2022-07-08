@@ -59,11 +59,15 @@ public class SwiftAppleHealthClinicalRecordsPlugin: NSObject, FlutterPlugin {
         if (call.method.elementsEqual("checkIfHealthDataAvailable")){
             checkIfHealthDataAvailable(call: call, result: result)
         }
+        
+        else if (call.method.elementsEqual("hasAuthorization")){
+            try! hasAuthorization(call: call, result: result)
+        }
         /// Handle requestAuthorization
         else if (call.method.elementsEqual("requestAuthorization")){
             try! requestAuthorization(call: call, result: result)
         }
-        
+    
         /// Handle getData
         else if (call.method.elementsEqual("getData")){
            try! getData(call: call, result: result)
@@ -76,25 +80,63 @@ public class SwiftAppleHealthClinicalRecordsPlugin: NSObject, FlutterPlugin {
     }
     
     
-    func requestAuthorization(call: FlutterMethodCall, result: @escaping FlutterResult) throws {
+    func hasAuthorization(call: FlutterMethodCall, result: @escaping FlutterResult) throws {
         
         let arguments = call.arguments as? NSDictionary
         
-        
-        guard let sampleTypeKey = arguments?["sampleType"] as? String
+                
+        guard let type = arguments?["type"] as? String
                 
         else {
             throw PluginError(message: "Invalid Arguments!")
         }
         
         
-        let status = healthStore.authorizationStatus(for: sampleTypesDict[sampleTypeKey]!)
         
+        let status = healthStore.authorizationStatus(for: sampleTypesDict[type]!)
+
         if status == HKAuthorizationStatus.sharingAuthorized {
             result(true)
+        } else {
+            result(false)
         }
         
-        healthStore.requestAuthorization(toShare: Set(), read: [sampleTypesDict[sampleTypeKey]!]) { (success, error) in
+        
+    }
+    
+    
+    func requestAuthorization(call: FlutterMethodCall, result: @escaping FlutterResult) throws {
+        
+        let arguments = call.arguments as? NSDictionary
+        
+                
+        guard let types = arguments?["types"] as? Array<String>
+                
+        else {
+            throw PluginError(message: "Invalid Arguments!")
+        }
+        
+        
+        var typesToRead = Set<HKSampleType>()
+        
+        for (_, key) in types.enumerated() {
+            guard let dataType = sampleTypesDict[key]
+                    
+            else {
+                throw PluginError(message: "Invalid Arguments!")
+            }
+            
+            typesToRead.insert(dataType)
+        }
+        
+        
+//        let status = healthStore.authorizationStatus(for: sampleTypesDict[sampleTypeKey]!)
+//
+//        if status == HKAuthorizationStatus.sharingAuthorized {
+//            result(true)
+//        }
+        
+        healthStore.requestAuthorization(toShare: Set(), read: typesToRead) { (success, error) in
             DispatchQueue.main.async {
                 result(success)
             }
@@ -122,32 +164,39 @@ public class SwiftAppleHealthClinicalRecordsPlugin: NSObject, FlutterPlugin {
     /// Use HKSampleQuery to query the HealthKit store for samples by type.
     func queryForSamples(sampleType: HKSampleType, result: @escaping FlutterResult) {
         let sortDescriptors = [NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)]
-        let query = HKSampleQuery(sampleType: sampleType, predicate: nil, limit: 100, sortDescriptors: sortDescriptors) {(_, samplesOrNil, error) in
+        
+        let today = Date()
+        let dateFrom = Calendar.current.date(byAdding: .year, value: -3, to: today)
+        
+        
+        let predicate = HKQuery.predicateForSamples(withStart: dateFrom, end: today, options: .strictEndDate)
+        
+        let query = HKSampleQuery(sampleType: sampleType, predicate: predicate, limit: 100, sortDescriptors: sortDescriptors) {(_, samplesOrNil, error) in
             DispatchQueue.main.async {
                 guard let samples = samplesOrNil else {
                     return
                 }
                 
-                let records = samples as? [HKClinicalRecord]
-            
+                let records = (samples as Any) as! [HKClinicalRecord]
                 
-                let dictionaries = records.map { sample -> NSDictionary in
-                    
-                    guard let fhirRecord = sample.first?.fhirResource else {
-                        print("No FHIR record found!")
-                        return NSDictionary.init()
+                var dictionaries = Array<NSDictionary>();
+                
+                for record in records {
+                    guard let fhirRecord = record.fhirResource else {
+                        return
                     }
                     
                     do {
                         let jsonDictionary = try JSONSerialization.jsonObject(with: fhirRecord.data, options: [])
                         
-                        return jsonDictionary as! NSDictionary
+                        dictionaries.append(jsonDictionary as! NSDictionary)
                     }
                     catch let error {
                         print("*** An error occurred while parsing the FHIR data: \(error.localizedDescription) ***")
-                        return NSDictionary.init()
                     }
+                    
                 }
+            
                 
                 result(dictionaries)
             }

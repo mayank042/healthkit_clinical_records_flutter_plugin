@@ -12,7 +12,12 @@ class MockAppleHealthClinicalRecordsPlatform
   Future<bool?> checkIfHealthDataAvailable() => Future.value(true);
 
   @override
-  Future<bool?> requestAuthorization(String sampleType) {
+  Future<bool?> requestAuthorization(List<String> sampleType) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool?> hasAuthorization(String type) {
     throw UnimplementedError();
   }
 

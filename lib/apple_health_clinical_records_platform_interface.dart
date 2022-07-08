@@ -27,8 +27,12 @@ abstract class AppleHealthClinicalRecordsPlatform extends PlatformInterface {
     throw UnimplementedError('checkIfHealthDataAvailable() has not been implemented.');
   }
 
-  Future<bool?> requestAuthorization(String sampleType) {
+  Future<bool?> requestAuthorization(List<String> types) {
     throw UnimplementedError('requestAuthorization() has not been implemented.');
+  }
+
+  Future<bool?> hasAuthorization(String type) {
+    throw UnimplementedError('hasAuthorization() has not been implemented.');
   }
 
   Future<dynamic> getData(String sampleType) {

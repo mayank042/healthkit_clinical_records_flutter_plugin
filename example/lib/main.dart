@@ -24,32 +24,53 @@ class _MyAppState extends State<MyApp> {
     initPlatformState();
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
+
   Future<void> initPlatformState() async {
-    bool status;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
+
     try {
-      status =
+
+
+      // First we check if Apple Health is available or not
+      final available =
           await _appleHealthClinicalRecordsPlugin.checkIfHealthDataAvailable() ?? false;
 
-      debugPrint(status ? 'available' : 'not available');
+      debugPrint(available ? 'available' : 'not available');
 
+      if (available) {
 
-      if (status) {
-        final authStatus = await _appleHealthClinicalRecordsPlugin.requestAuthorization(ClinicalType.allergy) ?? false;
+        // Then check the authorization status of required clinical types
+
+        final futures = ClinicalType.values.map((type) => _appleHealthClinicalRecordsPlugin.hasAuthorization(type));
+
+        final statuses = await Future.wait(futures);
+
+        var authStatus = false;
+
+        if (statuses.any((element) => element != true)) {
+          // Some or more clinical types are not authorized
+
+          var types = [
+            ClinicalType.allergy
+          ];
+
+          authStatus = await _appleHealthClinicalRecordsPlugin.requestAuthorization(ClinicalType.values) ?? false;
+
+        }
 
         debugPrint(authStatus.toString());
 
         if (authStatus) {
-          final data = await _appleHealthClinicalRecordsPlugin.getData(ClinicalType.allergy);
+
+          final records = ClinicalType.values.map((type ) => _appleHealthClinicalRecordsPlugin.getData(type));
+
+          final data = await Future.wait(records);
 
           debugPrint(data.toString());
         }
       }
 
-    } on PlatformException {
-      status = false;
+    } on PlatformException catch(err) {
+      debugPrint(err.toString());
     }
 
     // If the widget was removed from the tree while the asynchronous platform

@@ -49,8 +49,18 @@ class AppleHealthClinicalRecords {
         .checkIfHealthDataAvailable();
   }
 
-  Future<bool?> requestAuthorization(ClinicalType sampleType) {
-    return AppleHealthClinicalRecordsPlatform.instance.requestAuthorization(sampleType.name);
+  Future<bool?> requestAuthorization(List<ClinicalType> types) {
+
+    List<String> typesToRead = [];
+    for (var type in types) {
+      typesToRead.add(type.name);
+    }
+
+    return AppleHealthClinicalRecordsPlatform.instance.requestAuthorization(typesToRead);
+  }
+
+  Future<bool?> hasAuthorization(ClinicalType type) {
+    return AppleHealthClinicalRecordsPlatform.instance.hasAuthorization(type.name);
   }
 
   Future<dynamic> getData(ClinicalType sampleType) {
