@@ -7,7 +7,6 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 class MockAppleHealthClinicalRecordsPlatform
     with MockPlatformInterfaceMixin
     implements AppleHealthClinicalRecordsPlatform {
-
   @override
   Future<bool?> checkIfHealthDataAvailable() => Future.value(true);
 
@@ -28,17 +27,22 @@ class MockAppleHealthClinicalRecordsPlatform
 }
 
 void main() {
-  final AppleHealthClinicalRecordsPlatform initialPlatform = AppleHealthClinicalRecordsPlatform.instance;
+  final AppleHealthClinicalRecordsPlatform initialPlatform =
+      AppleHealthClinicalRecordsPlatform.instance;
 
   test('$MethodChannelAppleHealthClinicalRecords is the default instance', () {
-    expect(initialPlatform, isInstanceOf<MethodChannelAppleHealthClinicalRecords>());
+    expect(initialPlatform,
+        isInstanceOf<MethodChannelAppleHealthClinicalRecords>());
   });
 
   test('getPlatformVersion', () async {
-    AppleHealthClinicalRecords appleHealthClinicalRecordsPlugin = AppleHealthClinicalRecords();
-    MockAppleHealthClinicalRecordsPlatform fakePlatform = MockAppleHealthClinicalRecordsPlatform();
+    AppleHealthClinicalRecords appleHealthClinicalRecordsPlugin =
+        AppleHealthClinicalRecords();
+    MockAppleHealthClinicalRecordsPlatform fakePlatform =
+        MockAppleHealthClinicalRecordsPlatform();
     AppleHealthClinicalRecordsPlatform.instance = fakePlatform;
 
-    expect(await appleHealthClinicalRecordsPlugin.checkIfHealthDataAvailable(), '42');
+    expect(await appleHealthClinicalRecordsPlugin.checkIfHealthDataAvailable(),
+        '42');
   });
 }

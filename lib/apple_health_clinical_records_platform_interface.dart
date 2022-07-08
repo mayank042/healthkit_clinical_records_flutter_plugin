@@ -9,7 +9,8 @@ abstract class AppleHealthClinicalRecordsPlatform extends PlatformInterface {
 
   static final Object _token = Object();
 
-  static AppleHealthClinicalRecordsPlatform _instance = MethodChannelAppleHealthClinicalRecords();
+  static AppleHealthClinicalRecordsPlatform _instance =
+      MethodChannelAppleHealthClinicalRecords();
 
   /// The default instance of [AppleHealthClinicalRecordsPlatform] to use.
   ///
@@ -26,12 +27,14 @@ abstract class AppleHealthClinicalRecordsPlatform extends PlatformInterface {
 
   /// Performs the check if apple health is available on device
   Future<bool?> checkIfHealthDataAvailable() {
-    throw UnimplementedError('checkIfHealthDataAvailable() has not been implemented.');
+    throw UnimplementedError(
+        'checkIfHealthDataAvailable() has not been implemented.');
   }
 
   /// Request read only permission to [types]
   Future<bool?> requestAuthorization(List<String> types) {
-    throw UnimplementedError('requestAuthorization() has not been implemented.');
+    throw UnimplementedError(
+        'requestAuthorization() has not been implemented.');
   }
 
   /// Check if [type] already has read permission

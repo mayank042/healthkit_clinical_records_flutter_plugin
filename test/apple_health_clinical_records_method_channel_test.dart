@@ -3,7 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:apple_health_clinical_records/apple_health_clinical_records_method_channel.dart';
 
 void main() {
-  MethodChannelAppleHealthClinicalRecords platform = MethodChannelAppleHealthClinicalRecords();
+  MethodChannelAppleHealthClinicalRecords platform =
+      MethodChannelAppleHealthClinicalRecords();
   const MethodChannel channel = MethodChannel('apple_health_clinical_records');
 
   TestWidgetsFlutterBinding.ensureInitialized();

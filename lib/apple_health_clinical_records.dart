@@ -18,7 +18,6 @@ enum ClinicalType {
 extension ClinicalTypeX on ClinicalType {
   String get name {
     switch (this) {
-
       case ClinicalType.allergy:
         return 'allergy';
       case ClinicalType.condition:
@@ -41,10 +40,8 @@ extension ClinicalTypeX on ClinicalType {
 
 /// Class to be instantiated to use the plugin methods
 class AppleHealthClinicalRecords {
-
   /// Call to instance method [checkIfHealthDataAvailable]
   Future<bool?> checkIfHealthDataAvailable() {
-
     /// Android platform is not supported
     if (Platform.isAndroid) {
       return Future.value(false);
@@ -56,7 +53,6 @@ class AppleHealthClinicalRecords {
 
   /// Call to instance method [requestAuthorization]
   Future<bool?> requestAuthorization(List<ClinicalType> types) {
-
     List<String> typesToRead = [];
 
     /// Converting [types] to their string representation
@@ -64,12 +60,14 @@ class AppleHealthClinicalRecords {
       typesToRead.add(type.name);
     }
 
-    return AppleHealthClinicalRecordsPlatform.instance.requestAuthorization(typesToRead);
+    return AppleHealthClinicalRecordsPlatform.instance
+        .requestAuthorization(typesToRead);
   }
 
   /// Call to instance method [hasAuthorization]
   Future<bool?> hasAuthorization(ClinicalType type) {
-    return AppleHealthClinicalRecordsPlatform.instance.hasAuthorization(type.name);
+    return AppleHealthClinicalRecordsPlatform.instance
+        .hasAuthorization(type.name);
   }
 
   /// Call to instatnce method [getData]

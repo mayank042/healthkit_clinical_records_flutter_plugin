@@ -24,23 +24,20 @@ class _MyAppState extends State<MyApp> {
     initPlatformState();
   }
 
-
   Future<void> initPlatformState() async {
-
     try {
-
-
       // First we check if Apple Health is available or not
-      final available =
-          await _appleHealthClinicalRecordsPlugin.checkIfHealthDataAvailable() ?? false;
+      final available = await _appleHealthClinicalRecordsPlugin
+              .checkIfHealthDataAvailable() ??
+          false;
 
       debugPrint(available ? 'available' : 'not available');
 
       if (available) {
-
         // Then check the authorization status of required clinical types
 
-        final futures = ClinicalType.values.map((type) => _appleHealthClinicalRecordsPlugin.hasAuthorization(type));
+        final futures = ClinicalType.values.map(
+            (type) => _appleHealthClinicalRecordsPlugin.hasAuthorization(type));
 
         final statuses = await Future.wait(futures);
 
@@ -49,27 +46,25 @@ class _MyAppState extends State<MyApp> {
         if (statuses.any((element) => element != true)) {
           // Some or more clinical types are not authorized
 
-          var types = [
-            ClinicalType.allergy
-          ];
+          var types = [ClinicalType.allergy];
 
-          authStatus = await _appleHealthClinicalRecordsPlugin.requestAuthorization(ClinicalType.values) ?? false;
-
+          authStatus = await _appleHealthClinicalRecordsPlugin
+                  .requestAuthorization(ClinicalType.values) ??
+              false;
         }
 
         debugPrint(authStatus.toString());
 
         if (authStatus) {
-
-          final records = ClinicalType.values.map((type ) => _appleHealthClinicalRecordsPlugin.getData(type));
+          final records = ClinicalType.values
+              .map((type) => _appleHealthClinicalRecordsPlugin.getData(type));
 
           final data = await Future.wait(records);
 
           debugPrint(data.toString());
         }
       }
-
-    } on PlatformException catch(err) {
+    } on PlatformException catch (err) {
       debugPrint(err.toString());
     }
 
@@ -77,7 +72,6 @@ class _MyAppState extends State<MyApp> {
     // message was in flight, we want to discard the reply rather than calling
     // setState to update our non-existent appearance.
     if (!mounted) return;
-
   }
 
   @override
