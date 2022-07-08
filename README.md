@@ -44,7 +44,7 @@ Step 2: Enable "HealthKit" inside the "Capabilities" tab.
 
 Step 3: Enable "Clinical Health Records" capability for "HealthKit".
 
-![Clinical Health Records in HealthKit](https://drive.google.com/file/d/1hCxf_b2-SLefuwdfQb5MN3Ojs6-AKUZd/view?usp=sharing)
+![Clinical Health Records in HealthKit](./resources/clinical_records.png)
 
 ## Usage
 
